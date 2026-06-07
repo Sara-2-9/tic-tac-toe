@@ -1,8 +1,10 @@
+import { calculateWinner } from "@/utils/game-winner";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import { StyleSheet } from "react-native";
 import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
+import MyButton from "./ui/my-button";
 import Square from "./ui/square";
 
 type PositionProps = { row: number; col: number };
@@ -15,60 +17,9 @@ export default function Board() {
 
   const nextPlayer = xCount > oCount ? "O" : "X";
 
-  const coordsWinner = [
-    [
-      [0, 0],
-      [0, 1],
-      [0, 2],
-    ],
-    [
-      [1, 0],
-      [1, 1],
-      [1, 2],
-    ],
-    [
-      [2, 0],
-      [2, 1],
-      [2, 2],
-    ],
-    [
-      [0, 0],
-      [1, 1],
-      [2, 2],
-    ],
-    [
-      [0, 2],
-      [1, 1],
-      [2, 0],
-    ],
-    [
-      [0, 0],
-      [1, 0],
-      [2, 0],
-    ],
-    [
-      [0, 1],
-      [1, 1],
-      [2, 1],
-    ],
-    [
-      [0, 2],
-      [1, 2],
-      [2, 2],
-    ],
-  ];
+  const winner = calculateWinner(squares);
 
-  const winningCombo = coordsWinner.find((combo) => {
-    const [a, b, c] = combo;
-    const valueA = squares[a[0]][a[1]];
-    const valueB = squares[b[0]][b[1]];
-    const valueC = squares[c[0]][c[1]];
-    return valueA === valueB && valueB === valueC && valueA !== null;
-  });
-
-  const winner = winningCombo
-    ? squares[winningCombo[0][0]][winningCombo[0][1]]
-    : null;
+  const hasMoves = xCount > 0 || oCount > 0;
 
   function handleClick(position: PositionProps) {
     setSquares((prev) =>
@@ -80,6 +31,10 @@ export default function Board() {
           : row,
       ),
     );
+  }
+
+  function handleRestart() {
+    setSquares(Array(3).fill(Array(3).fill(null)));
   }
 
   return (
@@ -100,6 +55,11 @@ export default function Board() {
           ))}
         </ThemedView>
       ))}
+      <MyButton
+        title="Restart Game"
+        disabled={!hasMoves}
+        onPress={handleRestart}
+      />
       {winner && (
         <ThemedText style={styles.winner}>
           <Ionicons name="star" size={20} color="#F0BD44" /> Winner: {winner}{" "}
@@ -116,7 +76,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   winner: {
-    paddingVertical: 20,
+    marginVertical: 10,
     textAlign: "center",
   },
 });
