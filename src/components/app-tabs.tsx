@@ -31,7 +31,10 @@ export default function AppTabs() {
 
       <NativeTabs.Trigger name="game">
         <NativeTabs.Trigger.Label>Game</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="gamecontroller" renderingMode="template" />
+        <NativeTabs.Trigger.Icon
+          sf="gamecontroller.fill"
+          renderingMode="template"
+        />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
