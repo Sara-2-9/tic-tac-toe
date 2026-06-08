@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a cross-platform mobile and web application built with **Expo SDK 56** and **React Native 0.85.3**. It targets iOS, Android, and web from a single TypeScript/React codebase. The app is a Tic-Tac-Toe game built on top of an Expo starter template, featuring file-based routing, light/dark theme support, and platform-adaptive UI components.
+This is a cross-platform mobile and web application built with **Expo SDK 56** and **React Native 0.85.3**. It targets iOS, Android, and web from a single TypeScript/React codebase. The app features a Tic-Tac-Toe game and an AI chat screen, built on top of an Expo starter template with file-based routing, light/dark theme support, and platform-adaptive UI components.
 
 The entry point is `expo-router/entry` (configured in `package.json`), and all screens are defined under `src/app/` using Expo Router's file-based routing convention.
 
@@ -19,6 +19,7 @@ The entry point is `expo-router/entry` (configured in `package.json`), and all s
 - **Safe Areas**: react-native-safe-area-context ~5.7.0
 - **In-App Browser**: expo-web-browser ~56.0.5
 - **Device Info**: expo-device ~56.0.4
+- **AI SDK**: `@ai-sdk/react` ^3.0.199, `ai` ^6.0.197, `zod` ^4.4.3
 
 ## Project Structure
 
@@ -27,18 +28,21 @@ The entry point is `expo-router/entry` (configured in `package.json`), and all s
 ├── package.json              # Dependencies and npm scripts
 ├── tsconfig.json             # TypeScript config with path aliases
 ├── expo-env.d.ts             # Auto-generated Expo types (do not edit)
+├── utils.ts                  # Shared utilities (generateAPIUrl)
 ├── src/
 │   ├── app/                  # File-based routing screens and layouts
 │   │   ├── _layout.tsx       # Root layout: ThemeProvider + AnimatedSplashOverlay + AppTabs
 │   │   ├── index.tsx         # Home screen (welcome / getting started)
 │   │   ├── explore.tsx       # Explore screen (feature showcase / docs links)
-│   │   └── game/
-│   │       └── index.tsx     # Tic-Tac-Toe game screen
+│   │   ├── game/
+│   │   │   └── index.tsx     # Tic-Tac-Toe game screen
+│   │   └── ai/
+│   │       └── index.tsx     # AI Chat screen
 │   ├── components/           # Reusable React components
 │   │   ├── app-tabs.tsx      # Native tab navigator (unstable-native-tabs)
 │   │   ├── app-tabs.web.tsx  # Web tab navigator (expo-router/ui Tabs)
 │   │   ├── animated-icon.tsx / .web.tsx  # Animated splash icon
-│   │   ├── board.tsx         # Tic-Tac-Toe game board logic (turn alternation, move validation)
+│   │   ├── board.tsx         # Tic-Tac-Toe board UI and state management
 │   │   ├── themed-text.tsx   # Text component with theme + typography variants
 │   │   ├── themed-view.tsx   # View component with themed background colors
 │   │   ├── external-link.tsx # Link that opens in-app browser on native
@@ -46,7 +50,10 @@ The entry point is `expo-router/entry` (configured in `package.json`), and all s
 │   │   ├── hint-row.tsx      # Labeled hint row UI
 │   │   └── ui/
 │   │       ├── square.tsx    # Tic-Tac-Toe cell button
+│   │       ├── my-button.tsx # Reusable pressable button
 │   │       └── collapsible.tsx  # Animated collapsible section
+│   ├── utils/
+│   │   └── game-winner.ts    # Win-condition checker for Tic-Tac-Toe
 │   ├── hooks/
 │   │   ├── use-theme.ts      # Returns current theme color object
 │   │   ├── use-color-scheme.ts     # Re-exports from react-native
@@ -109,17 +116,28 @@ The project uses Expo's **development build** workflow (not Expo Go). Install th
 - The app uses **file-based routing** via `expo-router`.
 - `src/app/_layout.tsx` is the root layout. It wraps the app in a `ThemeProvider` and renders `AppTabs`.
 - Tabs are registered in both `app-tabs.tsx` (native) and `app-tabs.web.tsx` (web). When adding a new tab, update **both** files.
-- Current tabs: `index` (Home), `explore` (Explore), `game` (Tic-Tac-Toe).
+- Current tabs: `index` (Home), `explore` (Explore), `game` (Tic-Tac-Toe), `ai` (AI Chat).
 - New screens go in `src/app/` or nested directories. Layout files are named `_layout.tsx`.
 
 ## Game Logic
 
-The Tic-Tac-Toe implementation lives primarily in `src/components/board.tsx`:
+The Tic-Tac-Toe implementation is split across `src/components/board.tsx` and `src/utils/game-winner.ts`:
 
-- **Board state**: a 3×3 matrix (`string[][]`) managed with a single `useState`. Empty cells are `null`.
+- **Board state**: a 3×3 matrix (`string[][]`) managed with a single `useState` in `board.tsx`. Empty cells are `null`.
 - **Turn alternation**: derived at render-time by counting existing X and O moves (`squares.flat().filter(...).length`) rather than storing a separate boolean flag. If `xCount > oCount`, the next player is O; otherwise X.
 - **Move validation**: a cell that is already occupied (`!== null`) cannot be overwritten. This check lives inside the cell-mapping logic of `setSquares`.
+- **Win detection**: `calculateWinner(squares)` in `src/utils/game-winner.ts` checks all 8 winning combinations (3 rows, 3 columns, 2 diagonals) and returns the winning player or `null`.
 - **Method chaining**: array operations (`.flat().filter().length`) are chained for conciseness.
+
+## AI Chat Screen
+
+The AI Chat screen lives in `src/app/ai/index.tsx`:
+
+- **SDK**: Built with `@ai-sdk/react` (`useChat` hook) and `ai` (`DefaultChatTransport`).
+- **Fetch**: Uses `expo/fetch` instead of the global `fetch` for native compatibility.
+- **Endpoint**: `generateAPIUrl('/api/chat')` (defined in `utils.ts` at the project root).
+- **Environment**: In development, the API URL is derived from `Constants.experienceUrl`. In production, `EXPO_PUBLIC_API_BASE_URL` must be set.
+- **UI**: A simple scrollable chat interface with `TextInput` for user input. Messages are rendered as a list of roles (`user` / `assistant`) with text parts.
 
 ## Testing Instructions
 
