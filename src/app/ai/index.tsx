@@ -1,20 +1,11 @@
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { fetch as expoFetch } from "expo/fetch";
+import { useAi } from "@/context/ai";
 import { useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { generateAPIUrl } from "../../../utils";
 
 export default function App() {
   const [input, setInput] = useState("");
-  const { messages, error, sendMessage } = useChat({
-    transport: new DefaultChatTransport({
-      fetch: expoFetch as unknown as typeof globalThis.fetch,
-      api: generateAPIUrl("/api/chat"),
-    }),
-    onError: (error) => console.error(error, "ERROR"),
-  });
+  const { messages, error, sendMessage } = useAi();
 
   if (error) return <Text>{error.message}</Text>;
 
@@ -29,7 +20,7 @@ export default function App() {
         }}
       >
         <ScrollView style={{ flex: 1 }}>
-          {messages.map((m) => (
+          {messages?.map((m) => (
             <View key={m.id} style={{ marginVertical: 8 }}>
               <View>
                 <Text style={{ fontWeight: 700 }}>{m.role}</Text>

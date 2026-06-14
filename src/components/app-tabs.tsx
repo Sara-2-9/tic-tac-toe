@@ -13,7 +13,7 @@ export default function AppTabs() {
       indicatorColor={colors.backgroundElement}
       labelStyle={{ selected: { color: colors.text } }}
     >
-      <NativeTabs.Trigger name="index">
+      {/* <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           src={require("@/assets/images/tabIcons/home.png")}
@@ -27,7 +27,7 @@ export default function AppTabs() {
           src={require("@/assets/images/tabIcons/explore.png")}
           renderingMode="template"
         />
-      </NativeTabs.Trigger>
+      </NativeTabs.Trigger> */}
 
       <NativeTabs.Trigger name="game">
         <NativeTabs.Trigger.Label>Game</NativeTabs.Trigger.Label>
