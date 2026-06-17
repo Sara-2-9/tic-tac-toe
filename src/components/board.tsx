@@ -1,16 +1,24 @@
+import { matrix } from "@/constats/matrix";
+import { useAi } from "@/context/ai";
 import { calculateWinner } from "@/utils/game-winner";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
+import z from "zod";
 import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
 import MyButton from "./ui/my-button";
 import Square from "./ui/square";
 
 type PositionProps = { row: number; col: number };
+type SquaresProps = z.infer<typeof matrix>;
 
 export default function Board() {
-  const [squares, setSquares] = useState(Array(3).fill(Array(3).fill(null)));
+  const { object, error, submit, isLoading } = useAi();
+
+  const [squares, setSquares] = useState<SquaresProps>(
+    Array(3).fill(Array(3).fill(null)),
+  );
 
   const xCount = squares.flat().filter((value) => value === "X").length;
   const oCount = squares.flat().filter((value) => value === "O").length;
@@ -21,16 +29,28 @@ export default function Board() {
 
   const hasMoves = xCount > 0 || oCount > 0;
 
+  console.log("squares---", squares);
+
+  useEffect(() => {
+    console.log("object---", object);
+    if (!isLoading && !!object) setSquares(object.content);
+  }, [object, isLoading]);
+
   function handleClick(position: PositionProps) {
-    setSquares((prev) =>
-      prev.map((row, indexRow) =>
+    setSquares((prev) => {
+      const operation = prev.map((row, indexRow) =>
         indexRow === position.row
-          ? row.map((cell: number, indexCol: number) =>
+          ? row.map((cell, indexCol) =>
               indexCol === position.col && cell === null ? nextPlayer : cell,
             )
           : row,
-      ),
-    );
+      );
+      const squaresString = JSON.stringify(operation);
+      console.log("squarestring-----", squaresString);
+      submit(squaresString);
+      return operation;
+    });
+    // if (error) return error.message;
   }
 
   function handleRestart() {
@@ -41,7 +61,7 @@ export default function Board() {
     <ThemedView>
       {squares.map((row, indexRow) => (
         <ThemedView style={styles.grid} key={indexRow}>
-          {row.map((cell: string, indexCol: number) => (
+          {row.map((cell, indexCol) => (
             <Square
               key={indexCol}
               value={cell}

@@ -1,7 +1,9 @@
+import { matrixValue } from "@/constats/matrix";
 import { Pressable, StyleSheet, Text } from "react-native";
+import z from "zod";
 import { ThemedView } from "../themed-view";
 
-type Props = { value: string; onSquareClick: () => void };
+type Props = { value: z.infer<typeof matrixValue>; onSquareClick: () => void };
 
 export default function Square({ value, onSquareClick }: Props) {
   return (

@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function App() {
   const [input, setInput] = useState("");
-  const { messages, error, sendMessage } = useAi();
+  const { object, error, submit } = useAi();
 
   if (error) return <Text>{error.message}</Text>;
 
@@ -20,7 +20,7 @@ export default function App() {
         }}
       >
         <ScrollView style={{ flex: 1 }}>
-          {messages?.map((m) => (
+          {/* {messages?.map((m) => (
             <View key={m.id} style={{ marginVertical: 8 }}>
               <View>
                 <Text style={{ fontWeight: 700 }}>{m.role}</Text>
@@ -46,7 +46,7 @@ export default function App() {
                 })}
               </View>
             </View>
-          ))}
+          ))} */}
         </ScrollView>
 
         <View style={{ marginTop: 8 }}>
@@ -61,7 +61,7 @@ export default function App() {
             onChange={(e) => setInput(e.nativeEvent.text)}
             onSubmitEditing={(e) => {
               e.preventDefault();
-              sendMessage({ text: input });
+              // sendMessage({ text: input });
               setInput("");
             }}
             autoFocus={true}

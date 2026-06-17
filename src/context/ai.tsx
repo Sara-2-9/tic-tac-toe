@@ -1,14 +1,16 @@
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, UIMessage } from "ai";
-import { fetch as expoFetch } from "expo/fetch";
+import {
+  Experimental_UseObjectHelpers,
+  experimental_useObject as useObject,
+} from "@ai-sdk/react";
 import { createContext, use, type PropsWithChildren } from "react";
-import { generateAPIUrl } from "../../utils";
+import z from "zod";
 
-const AiContext = createContext<{
-  messages?: UIMessage[];
-  error?: Error;
-  sendMessage?: any;
-} | null>(null);
+const AiContext = createContext<Experimental_UseObjectHelpers<
+  {
+    content: unknown;
+  },
+  any
+> | null>(null);
 
 export function useAi() {
   const value = use(AiContext);
@@ -19,22 +21,10 @@ export function useAi() {
 }
 
 export function AiProvider({ children }: PropsWithChildren) {
-  const { messages, error, sendMessage } = useChat({
-    transport: new DefaultChatTransport({
-      fetch: expoFetch as unknown as typeof globalThis.fetch,
-      api: generateAPIUrl("/api/chat"),
-    }),
-    onError: (error) => console.error(error, "ERROR"),
+  const result = useObject({
+    api: "/api/chat",
+    schema: z.object({ content: z.string() }),
   });
-  return (
-    <AiContext.Provider
-      value={{
-        messages,
-        error,
-        sendMessage,
-      }}
-    >
-      {children}
-    </AiContext.Provider>
-  );
+
+  return <AiContext.Provider value={result}>{children}</AiContext.Provider>;
 }
