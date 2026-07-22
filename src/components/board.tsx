@@ -33,24 +33,22 @@ export default function Board() {
 
   useEffect(() => {
     console.log("object---", object);
-    if (!isLoading && !!object) setSquares(object.content);
+    if (!isLoading && !!object?.content)
+      setSquares(object.content as SquaresProps);
   }, [object, isLoading]);
 
   function handleClick(position: PositionProps) {
-    setSquares((prev) => {
-      const operation = prev.map((row, indexRow) =>
-        indexRow === position.row
-          ? row.map((cell, indexCol) =>
-              indexCol === position.col && cell === null ? nextPlayer : cell,
-            )
-          : row,
-      );
-      const squaresString = JSON.stringify(operation);
-      console.log("squarestring-----", squaresString);
-      submit(squaresString);
-      return operation;
-    });
-    // if (error) return error.message;
+    const operation = squares.map((row, indexRow) =>
+      indexRow === position.row
+        ? row.map((cell, indexCol) =>
+            indexCol === position.col && cell === null ? nextPlayer : cell,
+          )
+        : row,
+    );
+    const squaresString = JSON.stringify(operation);
+    console.log("squarestring-----", squaresString);
+    setSquares(operation);
+    submit(squaresString);
   }
 
   function handleRestart() {
@@ -80,6 +78,9 @@ export default function Board() {
         disabled={!hasMoves}
         onPress={handleRestart}
       />
+      {error && (
+        <ThemedText style={styles.error}>AI error: {error.message}</ThemedText>
+      )}
       {winner && (
         <ThemedText style={styles.winner}>
           <Ionicons name="star" size={20} color="#F0BD44" /> Winner: {winner}{" "}
@@ -98,5 +99,10 @@ const styles = StyleSheet.create({
   winner: {
     marginVertical: 10,
     textAlign: "center",
+  },
+  error: {
+    marginVertical: 10,
+    textAlign: "center",
+    color: "#D32F2F",
   },
 });
