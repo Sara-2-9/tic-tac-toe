@@ -1,73 +1,111 @@
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { useAi } from "@/context/ai";
 import { useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function App() {
+export default function AiChat() {
   const [input, setInput] = useState("");
-  const { object, error, submit } = useAi();
+  const { messages, error, submit } = useAi();
 
-  if (error) return <Text>{error.message}</Text>;
+  function handleSubmit() {
+    const text = input.trim();
+    if (!text) return;
+    submit(text);
+    setInput("");
+  }
 
   return (
-    <SafeAreaView style={{ height: "100%" }}>
-      <View
-        style={{
-          height: "95%",
-          display: "flex",
-          flexDirection: "column",
-          paddingHorizontal: 8,
-        }}
-      >
-        <ScrollView style={{ flex: 1 }}>
-          {/* {messages?.map((m) => (
-            <View key={m.id} style={{ marginVertical: 8 }}>
-              <View>
-                <Text style={{ fontWeight: 700 }}>{m.role}</Text>
-                {m.parts.map((part, i) => {
-                  switch (part.type) {
-                    case "text":
-                      return (
-                        <Text
-                          key={`${m.id}-${i}`}
-                          style={{
-                            width: "50%",
-                            backgroundColor: "#caf09c",
-                            padding: 12,
-                            borderBottomEndRadius: 26,
-                            borderTopEndRadius: 26,
-                            borderTopStartRadius: 26,
-                          }}
-                        >
-                          {part.text}
-                        </Text>
-                      );
-                  }
-                })}
-              </View>
+    <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          style={styles.messages}
+          contentContainerStyle={styles.messagesContent}
+        >
+          {messages.map((m) => (
+            <View
+              key={m.id}
+              style={[
+                styles.bubble,
+                m.role === "user" ? styles.userBubble : styles.assistantBubble,
+              ]}
+            >
+              <ThemedText
+                style={
+                  m.role === "user" ? styles.userText : styles.assistantText
+                }
+              >
+                {m.text}
+              </ThemedText>
             </View>
-          ))} */}
+          ))}
+          {error && (
+            <ThemedText style={styles.error}>
+              AI error: {error.message}
+            </ThemedText>
+          )}
         </ScrollView>
 
-        <View style={{ marginTop: 8 }}>
-          <TextInput
-            style={{
-              backgroundColor: "white",
-              padding: 12,
-              borderRadius: 50,
-            }}
-            placeholder="Say something..."
-            value={input}
-            onChange={(e) => setInput(e.nativeEvent.text)}
-            onSubmitEditing={(e) => {
-              e.preventDefault();
-              // sendMessage({ text: input });
-              setInput("");
-            }}
-            autoFocus={true}
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+        <TextInput
+          style={styles.input}
+          placeholder="Say something..."
+          value={input}
+          onChangeText={setInput}
+          onSubmitEditing={handleSubmit}
+          returnKeyType="send"
+          autoFocus={true}
+        />
+      </SafeAreaView>
+    </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: 8,
+  },
+  messages: {
+    flex: 1,
+  },
+  messagesContent: {
+    gap: 8,
+    paddingVertical: 8,
+  },
+  bubble: {
+    maxWidth: "80%",
+    padding: 12,
+    borderRadius: 26,
+  },
+  userBubble: {
+    alignSelf: "flex-end",
+    backgroundColor: "#0274DF",
+    borderBottomEndRadius: 4,
+  },
+  userText: {
+    color: "white",
+  },
+  assistantBubble: {
+    alignSelf: "flex-start",
+    backgroundColor: "#caf09c",
+    borderBottomStartRadius: 4,
+  },
+  assistantText: {
+    color: "#1a1a1a",
+  },
+  error: {
+    marginVertical: 10,
+    textAlign: "center",
+    color: "#D32F2F",
+  },
+  input: {
+    backgroundColor: "white",
+    padding: 12,
+    borderRadius: 50,
+    marginVertical: 8,
+  },
+});

@@ -14,7 +14,7 @@ type PositionProps = { row: number; col: number };
 type SquaresProps = z.infer<typeof matrix>;
 
 export default function Board() {
-  const { object, error, submit, isLoading } = useAi();
+  const { object, error, submit, isLoading, clearMessages } = useAi();
 
   const [squares, setSquares] = useState<SquaresProps>(
     Array(3).fill(Array(3).fill(null)),
@@ -53,6 +53,7 @@ export default function Board() {
 
   function handleRestart() {
     setSquares(Array(3).fill(Array(3).fill(null)));
+    clearMessages();
   }
 
   return (
