@@ -1,4 +1,4 @@
-import { matrix } from "@/constats/matrix";
+import { matrix } from "@/constants/matrix";
 import { useAi } from "@/context/ai";
 import { calculateWinner } from "@/utils/game-winner";
 import Ionicons from "@expo/vector-icons/Ionicons";

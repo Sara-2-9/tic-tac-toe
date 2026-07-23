@@ -1,4 +1,4 @@
-import { matrix } from "@/constats/matrix";
+import { matrix } from "@/constants/matrix";
 import { Output, streamText } from "ai";
 import { z } from "zod";
 

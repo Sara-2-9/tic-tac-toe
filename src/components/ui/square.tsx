@@ -1,4 +1,4 @@
-import { matrixValue } from "@/constats/matrix";
+import { matrixValue } from "@/constants/matrix";
 import { Pressable, StyleSheet, Text } from "react-native";
 import z from "zod";
 import { ThemedView } from "../themed-view";
