@@ -1,16 +1,16 @@
-import { matrix } from "@/constats/matrix";
+import { matrix } from "@/constants/matrix";
 import {
-  Experimental_UseObjectHelpers,
-  experimental_useObject as useObject,
+    Experimental_UseObjectHelpers,
+    experimental_useObject as useObject,
 } from "@ai-sdk/react";
 import { fetch as expoFetch } from "expo/fetch";
 import {
-  createContext,
-  use,
-  useEffect,
-  useRef,
-  useState,
-  type PropsWithChildren,
+    createContext,
+    use,
+    useEffect,
+    useRef,
+    useState,
+    type PropsWithChildren,
 } from "react";
 import z from "zod";
 import { generateAPIUrl } from "../../utils";
@@ -23,6 +23,7 @@ export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
+  timestamp: number;
 };
 
 type AiContextValue = Experimental_UseObjectHelpers<AiObject, any> & {
@@ -55,7 +56,7 @@ export function AiProvider({ children }: PropsWithChildren) {
   const submitWithHistory: typeof submit = (input) => {
     setMessages((prev) => [
       ...prev,
-      { id: nextId(), role: "user", text: input },
+      { id: nextId(), role: "user", text: input, timestamp: Date.now() },
     ]);
     submit(input);
   };
@@ -68,6 +69,7 @@ export function AiProvider({ children }: PropsWithChildren) {
           id: nextId(),
           role: "assistant",
           text: JSON.stringify(object.content),
+          timestamp: Date.now(),
         },
       ]);
     }

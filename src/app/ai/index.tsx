@@ -38,6 +38,19 @@ export default function AiChat() {
               >
                 {m.text}
               </ThemedText>
+              <ThemedText
+                style={[
+                  styles.timestamp,
+                  m.role === "user"
+                    ? styles.userTimestamp
+                    : styles.assistantTimestamp,
+                ]}
+              >
+                {new Date(m.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </ThemedText>
             </View>
           ))}
           {error && (
@@ -96,6 +109,17 @@ const styles = StyleSheet.create({
   },
   assistantText: {
     color: "#1a1a1a",
+  },
+  timestamp: {
+    fontSize: 10,
+    marginTop: 4,
+    alignSelf: "flex-end",
+  },
+  userTimestamp: {
+    color: "rgba(255, 255, 255, 0.7)",
+  },
+  assistantTimestamp: {
+    color: "rgba(0, 0, 0, 0.45)",
   },
   error: {
     marginVertical: 10,
