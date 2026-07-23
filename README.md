@@ -1,13 +1,19 @@
 # Expo Tic-Tac-Toe
 
-A cross-platform mobile and web application built with **Expo SDK 56** and **React Native 0.85.3**. It features a fully functional Tic-Tac-Toe game and an integrated AI chat screen, with light/dark theme support and native tab navigation.
+A cross-platform mobile and web application built with **Expo SDK 56** and **React Native 0.85.3**. Play Tic-Tac-Toe against an AI opponent and watch every exchange in a chat-style log, with light/dark theme support and native tab navigation.
+
+## Screenshots
+
+| Game start | Playing vs AI | AI chat log | Winner |
+|---|---|---|---|
+| ![Game start](docs/screenshots/tic-tac-toe-start-1.png) | ![Playing vs AI](docs/screenshots/tic-tac-toe-game-2.png) | ![AI chat log](docs/screenshots/tic-tac-toe-aiChat-3.png) | ![Winner](docs/screenshots/tic-tac-toe-winner-4.png) |
 
 ## Overview
 
 - **Home** — Welcome screen with getting-started hints
 - **Explore** — Feature showcase of the Expo starter template (routing, images, themes, animations)
-- **Game** — Tic-Tac-Toe with turn logic, move validation, and winner detection
-- **AI** — AI-powered chat using `@ai-sdk/react`
+- **Game** — Tic-Tac-Toe against an AI opponent, with move validation and winner detection
+- **AI** — Chat-style log of every move sent to and received from the AI, with timestamps
 
 ## Tech Stack
 
@@ -33,18 +39,20 @@ A cross-platform mobile and web application built with **Expo SDK 56** and **Rea
 ├── utils.ts                  # Shared utilities (generateAPIUrl)
 ├── src/
 │   ├── app/                  # File-based routing screens and layouts
-│   │   ├── _layout.tsx       # Root layout: ThemeProvider + AnimatedSplashOverlay + AppTabs
+│   │   ├── _layout.tsx       # Root layout: ThemeProvider + AiProvider + AnimatedSplashOverlay + AppTabs
 │   │   ├── index.tsx         # Home screen
 │   │   ├── explore.tsx       # Explore screen
 │   │   ├── game/
 │   │   │   └── index.tsx     # Tic-Tac-Toe game screen
-│   │   └── ai/
-│   │       └── index.tsx     # AI Chat screen
+│   │   ├── ai/
+│   │   │   └── index.tsx     # AI Chat screen (chat-style log of AI exchanges)
+│   │   └── api/
+│   │       └── chat+api.ts   # API route: POST handler streaming the AI move
 │   ├── components/           # Reusable React components
 │   │   ├── app-tabs.tsx      # Native tab navigator (unstable-native-tabs)
 │   │   ├── app-tabs.web.tsx  # Web tab navigator (expo-router/ui Tabs)
 │   │   ├── animated-icon.tsx / .web.tsx  # Animated splash icon
-│   │   ├── board.tsx         # Tic-Tac-Toe board UI and state management
+│   │   ├── board.tsx         # Tic-Tac-Toe board UI, state management and AI moves
 │   │   ├── themed-text.tsx   # Text component with theme + typography variants
 │   │   ├── themed-view.tsx   # View component with themed background colors
 │   │   ├── external-link.tsx # Link that opens in-app browser on native
@@ -54,6 +62,8 @@ A cross-platform mobile and web application built with **Expo SDK 56** and **Rea
 │   │       ├── square.tsx    # Tic-Tac-Toe cell button
 │   │       ├── my-button.tsx # Reusable pressable button
 │   │       └── collapsible.tsx  # Animated collapsible section
+│   ├── context/
+│   │   └── ai.tsx            # AiProvider: shared useObject state + chat message history
 │   ├── utils/
 │   │   └── game-winner.ts    # Win-condition checker for Tic-Tac-Toe
 │   ├── hooks/
@@ -61,15 +71,31 @@ A cross-platform mobile and web application built with **Expo SDK 56** and **Rea
 │   │   ├── use-color-scheme.ts
 │   │   └── use-color-scheme.web.ts
 │   ├── constants/
-│   │   └── theme.ts          # Colors, fonts, spacing, layout constants
+│   │   ├── theme.ts          # Colors, fonts, spacing, layout constants
+│   │   └── matrix.ts         # Zod schema for the 3x3 board matrix ("X" | "O" | null)
 │   └── global.css            # CSS custom properties for web fonts
 ├── assets/
 │   ├── images/               # Icons, splash, logos, tutorial, tab icons
 │   └── expo.icon/            # iOS app icon assets
+├── docs/
+│   └── screenshots/          # App screenshots used in this README
 ├── scripts/
 │   └── reset-project.js      # Utility to wipe src/ and start fresh
 └── ios/                      # Generated native iOS project (prebuild)
 ```
+
+## Getting Started
+
+1. Install dependencies: `npm install`
+2. Create a `.env.local` file with your [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) key:
+
+   ```
+   AI_GATEWAY_API_KEY=your_key_here
+   ```
+
+3. Start the dev server: `npm start` (or `npm run ios` / `npm run android` / `npm run web`)
+
+The AI API route (`/api/chat`) will not work without `AI_GATEWAY_API_KEY`. In production, the app also requires `EXPO_PUBLIC_API_BASE_URL` pointing to the deployed API.
 
 ## Commands
 
@@ -90,27 +116,32 @@ The app uses `expo-router` file-based routing with 4 tabs:
 
 1. **Home** (`/`) — Landing screen
 2. **Explore** (`/explore`) — Feature showcase
-3. **Game** (`/game`) — Tic-Tac-Toe
-4. **AI** (`/ai`) — AI Chat
+3. **Game** (`/game`) — Tic-Tac-Toe vs AI
+4. **AI** (`/ai`) — AI chat log
 
 On native, tabs are handled by `unstable-native-tabs`; on web by `expo-router/ui Tabs`. When adding a new tab, update **both** `app-tabs.tsx` and `app-tabs.web.tsx`.
 
 ## Features
 
-### Tic-Tac-Toe
+### Tic-Tac-Toe vs AI
 
 - 3×3 board with state managed by `useState`
-- Turn alternation (X / O) derived by counting existing moves
+- The human plays **X**, the AI plays **O** via the `/api/chat` endpoint
+- Turn alternation derived by counting existing moves
 - Move validation: occupied cells cannot be overwritten
+- The AI's move is applied when the response stream completes
 - Winner detection via `calculateWinner()` in `src/utils/game-winner.ts`
-- "Restart Game" button (disabled when no moves have been made)
+- AI errors are shown below the board
+- "Restart Game" button (disabled when no moves have been made) — also clears the AI chat log
 
-### AI Chat
+### AI Chat Log
 
-- Chat interface built with `@ai-sdk/react` and `DefaultChatTransport`
-- Uses `expo/fetch` for network requests
-- Endpoint configured via `generateAPIUrl('/api/chat')`
-- In production, requires the `EXPO_PUBLIC_API_BASE_URL` environment variable
+- Shared message history in `AiProvider` (`src/context/ai.tsx`), built on `experimental_useObject` from `@ai-sdk/react`
+- Every request and AI response is recorded as a chat message — including moves made from the Game tab
+- Chat bubbles with timestamps (`HH:mm`, device locale): user right/blue, AI left/green
+- Structured output validated with the same zod schema on client and server (`src/constants/matrix.ts`)
+- Uses `expo/fetch` for network requests and `generateAPIUrl('/api/chat')` as the endpoint
+- The API route streams the move with `streamText` + `Output.object` (model: `anthropic/claude-3-haiku` via Vercel AI Gateway)
 
 ## Theming
 
