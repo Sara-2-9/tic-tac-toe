@@ -3,7 +3,7 @@ import { useAi } from "@/context/ai";
 import { calculateWinner } from "@/utils/game-winner";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import z from "zod";
 import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
@@ -38,6 +38,7 @@ export default function Board() {
   }, [object, isLoading]);
 
   function handleClick(position: PositionProps) {
+    if (isLoading || winner) return;
     const operation = squares.map((row, indexRow) =>
       indexRow === position.row
         ? row.map((cell, indexCol) =>
@@ -64,6 +65,7 @@ export default function Board() {
             <Square
               key={indexCol}
               value={cell}
+              disabled={isLoading || !!winner}
               onSquareClick={() =>
                 handleClick({
                   row: indexRow,
@@ -74,6 +76,20 @@ export default function Board() {
           ))}
         </ThemedView>
       ))}
+      <View style={styles.status}>
+        {isLoading ? (
+          <>
+            <ActivityIndicator size="small" color="#0274DF" />
+            <ThemedText style={styles.statusText}>
+              AI is thinking...
+            </ThemedText>
+          </>
+        ) : (
+          !winner && (
+            <ThemedText style={styles.statusText}>Your move</ThemedText>
+          )
+        )}
+      </View>
       <MyButton
         title="Restart Game"
         disabled={!hasMoves}
@@ -96,6 +112,17 @@ const styles = StyleSheet.create({
   grid: {
     display: "flex",
     flexDirection: "row",
+  },
+  status: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    minHeight: 24,
+    marginVertical: 10,
+  },
+  statusText: {
+    textAlign: "center",
   },
   winner: {
     marginVertical: 10,

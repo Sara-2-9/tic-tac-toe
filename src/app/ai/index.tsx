@@ -2,12 +2,18 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAi } from "@/context/ai";
 import { useState } from "react";
-import { ScrollView, StyleSheet, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AiChat() {
   const [input, setInput] = useState("");
-  const { messages, error, submit } = useAi();
+  const { messages, error, submit, isLoading } = useAi();
 
   function handleSubmit() {
     const text = input.trim();
@@ -53,6 +59,16 @@ export default function AiChat() {
               </ThemedText>
             </View>
           ))}
+          {isLoading && (
+            <View style={[styles.bubble, styles.assistantBubble]}>
+              <View style={styles.typing}>
+                <ActivityIndicator size="small" color="#1a1a1a" />
+                <ThemedText style={styles.assistantText}>
+                  AI is thinking...
+                </ThemedText>
+              </View>
+            </View>
+          )}
           {error && (
             <ThemedText style={styles.error}>
               AI error: {error.message}
@@ -67,6 +83,7 @@ export default function AiChat() {
           onChangeText={setInput}
           onSubmitEditing={handleSubmit}
           returnKeyType="send"
+          editable={!isLoading}
           autoFocus={true}
         />
       </SafeAreaView>
@@ -109,6 +126,11 @@ const styles = StyleSheet.create({
   },
   assistantText: {
     color: "#1a1a1a",
+  },
+  typing: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   timestamp: {
     fontSize: 10,
