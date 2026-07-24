@@ -8,9 +8,9 @@ The entry point is `expo-router/entry` (configured in `package.json`), and all s
 
 ## Screenshots
 
-| Game start | Playing vs AI | AI chat log | Winner |
-|---|---|---|---|
-| ![Game start](docs/screenshots/tic-tac-toe-start-1.png) | ![Playing vs AI](docs/screenshots/tic-tac-toe-game-2.png) | ![AI chat log](docs/screenshots/tic-tac-toe-aiChat-3.png) | ![Winner](docs/screenshots/tic-tac-toe-winner-4.png) |
+| Game start | AI thinking (Game) | Your move (Game) | Chat log (AI) | AI thinking (AI) |
+|---|---|---|---|---|
+| ![Game start](docs/screenshots/tic-tac-toe-start-1.png) | ![AI thinking in the Game tab](docs/screenshots/tic-tac-toe-ai-thinking-game-2.png) | ![Your move in the Game tab](docs/screenshots/tic-tac-toe-moves-game-3.png) | ![Chat log in the AI tab](docs/screenshots/tic-tac-toe-moves-chat-4.png) | ![AI thinking in the AI tab](docs/screenshots/tic-tac-to-ai-thinking-chat-5.png) |
 
 ## Technology Stack
 
@@ -142,6 +142,7 @@ The Tic-Tac-Toe implementation is split across `src/components/board.tsx` and `s
 - **Move validation**: a cell that is already occupied (`!== null`) cannot be overwritten. This check lives inside the cell-mapping logic in `handleClick`.
 - **Playing against the AI**: the human plays X, the AI plays O. `handleClick` computes the new board **outside** the `setSquares` updater, then calls `setSquares(operation)` and `submit(JSON.stringify(operation))` as separate statements. Never call `submit` (or any side effect) inside a `setState` updater: updaters must be pure and React may invoke them during render — doing so triggers "Cannot update a component while rendering a different component".
 - **Applying the AI move**: a `useEffect` watches `object`/`isLoading` from `useAi()` and replaces the board with `object.content` only when the stream has completed (`!isLoading`). Partial streamed objects are ignored.
+- **Response state feedback**: while `isLoading`, a status row below the board shows an `ActivityIndicator` with "AI is thinking..." and all cells are disabled (`Square` accepts a `disabled` prop, rendered with reduced opacity); `handleClick` also guards with `if (isLoading || winner) return;`. When idle and no winner, the status row shows "Your move". Cells stay disabled after a win.
 - **AI errors**: `error` from `useAi()` is rendered below the board so failures are visible instead of silent.
 - **Restart**: `handleRestart` resets the board and calls `clearMessages()` from the AI context, which also empties the chat log in the AI tab.
 - **Win detection**: `calculateWinner(squares)` in `src/utils/game-winner.ts` checks all 8 winning combinations (3 rows, 3 columns, 2 diagonals) and returns the winning player or `null`.
@@ -164,6 +165,7 @@ All AI communication is centralized in `src/context/ai.tsx` (`AiProvider`, mount
 The AI Chat screen lives in `src/app/ai/index.tsx`:
 
 - **UI**: a chat-style scrollable list of message bubbles — user messages right-aligned (blue `#0274DF`, white text), assistant messages left-aligned (light green `#caf09c`, dark text). Each bubble shows a timestamp (`HH:mm`, device locale) under the text.
+- **Response state feedback**: while `isLoading`, an assistant-style "AI is thinking..." bubble with an `ActivityIndicator` appears at the end of the list (also visible when the request was started from the Game tab, since the state lives in the shared provider), and the input is disabled (`editable={!isLoading}`).
 - **Input**: a `TextInput` that calls `submit(text)` on send. Note the endpoint is the Tic-Tac-Toe move predictor, so free-text input still produces a board matrix (or a validation error), not a conversational reply.
 - **Errors**: `error` from `useAi()` is rendered below the message list.
 

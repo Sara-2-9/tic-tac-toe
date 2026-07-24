@@ -4,9 +4,9 @@ A cross-platform mobile and web application built with **Expo SDK 56** and **Rea
 
 ## Screenshots
 
-| Game start | Playing vs AI | AI chat log | Winner |
-|---|---|---|---|
-| ![Game start](docs/screenshots/tic-tac-toe-start-1.png) | ![Playing vs AI](docs/screenshots/tic-tac-toe-game-2.png) | ![AI chat log](docs/screenshots/tic-tac-toe-aiChat-3.png) | ![Winner](docs/screenshots/tic-tac-toe-winner-4.png) |
+| Game start | AI thinking (Game) | Your move (Game) | Chat log (AI) | AI thinking (AI) |
+|---|---|---|---|---|
+| ![Game start](docs/screenshots/tic-tac-toe-start-1.png) | ![AI thinking in the Game tab](docs/screenshots/tic-tac-toe-ai-thinking-game-2.png) | ![Your move in the Game tab](docs/screenshots/tic-tac-toe-moves-game-3.png) | ![Chat log in the AI tab](docs/screenshots/tic-tac-toe-moves-chat-4.png) | ![AI thinking in the AI tab](docs/screenshots/tic-tac-to-ai-thinking-chat-5.png) |
 
 ## Overview
 
@@ -130,6 +130,7 @@ On native, tabs are handled by `unstable-native-tabs`; on web by `expo-router/ui
 - Turn alternation derived by counting existing moves
 - Move validation: occupied cells cannot be overwritten
 - The AI's move is applied when the response stream completes
+- Response state feedback: "AI is thinking..." spinner while waiting, "Your move" when idle; board cells are disabled during the AI's turn and after a win
 - Winner detection via `calculateWinner()` in `src/utils/game-winner.ts`
 - AI errors are shown below the board
 - "Restart Game" button (disabled when no moves have been made) — also clears the AI chat log
@@ -139,6 +140,7 @@ On native, tabs are handled by `unstable-native-tabs`; on web by `expo-router/ui
 - Shared message history in `AiProvider` (`src/context/ai.tsx`), built on `experimental_useObject` from `@ai-sdk/react`
 - Every request and AI response is recorded as a chat message — including moves made from the Game tab
 - Chat bubbles with timestamps (`HH:mm`, device locale): user right/blue, AI left/green
+- "AI is thinking..." typing bubble while the response streams; input disabled during the wait
 - Structured output validated with the same zod schema on client and server (`src/constants/matrix.ts`)
 - Uses `expo/fetch` for network requests and `generateAPIUrl('/api/chat')` as the endpoint
 - The API route streams the move with `streamText` + `Output.object` (model: `anthropic/claude-3-haiku` via Vercel AI Gateway)
