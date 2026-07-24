@@ -1,6 +1,6 @@
 # Expo Tic-Tac-Toe
 
-A cross-platform mobile and web application built with **Expo SDK 56** and **React Native 0.85.3**. Play Tic-Tac-Toe against an AI opponent and watch every exchange in a chat-style log, with light/dark theme support and native tab navigation.
+A cross-platform mobile and web application built with **Expo SDK 57** and **React Native 0.86.0**. Play Tic-Tac-Toe against an AI opponent and watch every exchange in a chat-style log, with light/dark theme support and native tab navigation.
 
 ## Screenshots
 
@@ -19,13 +19,13 @@ A cross-platform mobile and web application built with **Expo SDK 56** and **Rea
 
 | Technology | Version |
 |-----------|---------|
-| Expo | ~56.0.9 |
-| React Native | 0.85.3 |
+| Expo | ^57.0.0 |
+| React Native | 0.86.0 |
 | React | 19.2.3 |
 | TypeScript | ~6.0.3 |
-| expo-router | ~56.2.9 |
-| react-native-reanimated | 4.3.1 |
-| react-native-gesture-handler | ~2.31.1 |
+| expo-router | ~57.0.8 |
+| react-native-reanimated | 4.5.0 |
+| react-native-gesture-handler | ~2.32.0 |
 | @ai-sdk/react | ^3.0.199 |
 | ai | ^6.0.197 |
 | zod | ^4.4.3 |
@@ -86,7 +86,7 @@ A cross-platform mobile and web application built with **Expo SDK 56** and **Rea
 
 ## Getting Started
 
-1. Install dependencies: `npm install`
+1. Install dependencies: `bun install` (the project uses bun; `bun.lock` is the only lockfile)
 2. Create a `.env.local` file with your [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) key:
 
    ```
@@ -168,6 +168,6 @@ Configured in `tsconfig.json`:
 
 ## Documentation
 
-- [Expo SDK 56 docs](https://docs.expo.dev/versions/v56.0.0/)
+- [Expo SDK 57 docs](https://docs.expo.dev/versions/v57.0.0/)
 - [Expo Router](https://docs.expo.dev/router/introduction/)
 - [AI SDK React](https://sdk.vercel.ai/docs/ai-sdk-ui/overview)

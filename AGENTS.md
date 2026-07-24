@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a cross-platform mobile and web application built with **Expo SDK 56** and **React Native 0.85.3**. It targets iOS, Android, and web from a single TypeScript/React codebase. The app features a Tic-Tac-Toe game played against an AI opponent and an AI chat screen that logs every exchange with the AI in a chat-style view, built on top of an Expo starter template with file-based routing, light/dark theme support, and platform-adaptive UI components.
+This is a cross-platform mobile and web application built with **Expo SDK 57** and **React Native 0.86.0**. It targets iOS, Android, and web from a single TypeScript/React codebase. The app features a Tic-Tac-Toe game played against an AI opponent and an AI chat screen that logs every exchange with the AI in a chat-style view, built on top of an Expo starter template with file-based routing, light/dark theme support, and platform-adaptive UI components.
 
 The entry point is `expo-router/entry` (configured in `package.json`), and all screens are defined under `src/app/` using Expo Router's file-based routing convention.
 
@@ -14,17 +14,17 @@ The entry point is `expo-router/entry` (configured in `package.json`), and all s
 
 ## Technology Stack
 
-- **Runtime**: Expo ~56.0.9, React Native 0.85.3, React 19.2.3
+- **Runtime**: Expo ^57.0.0, React Native 0.86.0, React 19.2.3
 - **Language**: TypeScript ~6.0.3 (strict mode enabled)
-- **Router**: expo-router ~56.2.9 with typed routes and `unstable-native-tabs`
+- **Router**: expo-router ~57.0.8 with typed routes and `unstable-native-tabs`
 - **Styling**: React Native `StyleSheet` + platform-specific CSS modules for web (`*.module.css`)
-- **Animations**: react-native-reanimated 4.3.1, react-native-worklets 0.8.3
-- **Images**: expo-image ~56.0.10
-- **Icons**: expo-symbols ~56.0.6 (SF Symbols / Material icons)
-- **Gestures**: react-native-gesture-handler ~2.31.1
+- **Animations**: react-native-reanimated 4.5.0, react-native-worklets 0.10.0
+- **Images**: expo-image ~57.0.1
+- **Icons**: expo-symbols ~57.0.1 (SF Symbols / Material icons)
+- **Gestures**: react-native-gesture-handler ~2.32.0
 - **Safe Areas**: react-native-safe-area-context ~5.7.0
-- **In-App Browser**: expo-web-browser ~56.0.5
-- **Device Info**: expo-device ~56.0.4
+- **In-App Browser**: expo-web-browser ~57.0.2
+- **Device Info**: expo-device ~57.0.1
 - **AI SDK**: `@ai-sdk/react` ^3.0.199 (`experimental_useObject`), `ai` ^6.0.197 (`streamText` + `Output.object`), `zod` ^4.4.3
 
 ## Project Structure
@@ -103,6 +103,8 @@ Always use these aliases for imports instead of relative paths. The only excepti
 | `npm run reset-project` | Run the reset script to clear starter code |
 
 The project uses Expo's **development build** workflow (not Expo Go). Install the dev client via `expo-dev-client`.
+
+**Package manager**: the project uses **bun** (`bun.lock` is the only lockfile; `package-lock.json` was removed to avoid mixed lockfiles, which breaks EAS Build inference and `expo-doctor` checks). Use `bun install` / `bunx` instead of `npm install` / `npx` when adding packages, and prefer `bunx expo install <pkg>` for Expo modules so version validation against the SDK is applied. The `npm run ...` scripts above work with any package manager (e.g. `bun run ios`).
 
 ## Code Style Guidelines
 
@@ -191,4 +193,4 @@ There is **no test framework currently installed**. The README suggests followin
 
 ## Docs Reference
 
-Expo SDK 56 is still in active development. Read the exact versioned docs at https://docs.expo.dev/versions/v56.0.0/ before writing any code that uses Expo APIs.
+Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing any code that uses Expo APIs.
